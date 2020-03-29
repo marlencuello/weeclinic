@@ -14,8 +14,11 @@ class CreateHistoriasclinicasTable extends Migration
     {
         Schema::create('historiasclinicas', function (Blueprint $table) {
             $table->increments('id');
+            $table->unsignedInteger('paciente_id');
             $table->longText('observacion');
             $table->timestamps();
+            //RELACIONES ENTRE TABLAS
+            $table->foreign('paciente_id')->references('id')->on('pacientes');
         });
     }
 
