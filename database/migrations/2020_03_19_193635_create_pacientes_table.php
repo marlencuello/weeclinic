@@ -14,10 +14,14 @@ class CreatePacientesTable extends Migration
     {
         Schema::create('pacientes', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('nombres_apellidos');
+            $table->unsignedInteger('prepaga_id')->nullable();
+            $table->string('nombre');
+            $table->string('apellido');
             $table->enum('tipo_doc',['DNI', 'LC', 'LE']);
             $table->char('nro_doc', 8);
             $table->timestamps();
+            //RELACIONES ENTRE TABLAS
+            $table->foreign('prepaga_id')->references('id')->on('prepagas');
         });
     }
 
