@@ -32,7 +32,27 @@ class PacienteCrudController extends CrudController
     protected function setupListOperation()
     {
         // TODO: remove setFromDb() and manually define Columns, maybe Filters
-        $this->crud->setFromDb();
+        //$this->crud->setFromDb();
+        $this->crud->addColumn([
+            'name' => 'nombre', // The db column name
+            'label' => "Nombre", // Table column heading
+            'type' => 'Text'
+        ]);
+        $this->crud->addColumn([
+            'name' => 'apellido', // The db column name
+            'label' => "Apellido", // Table column heading
+            'type' => 'Text'
+        ]);
+        $this->crud->addColumn([
+            'name' => 'tipo_doc', // The db column name
+            'label' => "T. Documento", // Table column heading
+            'type' => 'Text'
+        ]);
+        $this->crud->addColumn([
+            'name' => 'nro_doc', // The db column name
+            'label' => "N. Documento", // Table column heading
+            'type' => 'Text'
+        ]);
         $this->crud->enableExportButtons();
     }
 
@@ -42,9 +62,17 @@ class PacienteCrudController extends CrudController
         // TODO: remove setFromDb() and manually define Fields
         //$this->crud->setFromDb();
         $this->crud->addField([
-            'name' => 'nombres_apellidos',
+            'name' => 'nombre',
             'type' => 'text',
-            'label' => "Apellido y nombre",
+            'label' => "Nombre",
+            'attributes' => [
+                'required' => 'required'
+            ]
+        ]);
+        $this->crud->addField([
+            'name' => 'apellido',
+            'type' => 'text',
+            'label' => "Apellido",
             'attributes' => [
                 'required' => 'required'
             ]
@@ -64,13 +92,23 @@ class PacienteCrudController extends CrudController
                 'required' => 'required'
             ],
         ]);
-        $this->crud->addField([
-            'type' => 'select2',
-            'name' => 'prepaga_id', // the relationship name in your Model
-            'entity' => 'prepagas', // the relationship name in your Model
-            'attribute' => 'name', // attribute on Article that is shown to admin
-            'pivot' => false, // on create&update, do you need to add/delete pivot table entries?
-        ]);
+        $this->crud->addField(
+            [  // Select
+                'label' => "Seleccione prepaga",
+                'type' => 'select',
+                'name' => 'prepaga_id', // the db column for the foreign key
+                'entity' => 'prepagas', // the method that defines the relationship in your Model
+                'attribute' => 'name', // foreign key attribute that is shown to user
+
+                // optional
+                'model' => "App\Models\Prepaga",
+                'options'   => (function ($query) {
+                    return $query->orderBy('name', 'ASC')->get();
+                }), // force the related options to be a custom query, instead of all(); you can use this to filter the results show in the select
+            ]
+        )->afterField('nro_doc');
+
+        $this->crud->removeField('observacion');
     }
 
     protected function setupUpdateOperation()
@@ -151,7 +189,7 @@ class PacienteCrudController extends CrudController
     public function saveHistoriaClinica(Request $request = null)
     {
         $this->crud->hasAccessOrFail('update');
-        
+
         \Alert::success('Moderation saved for this entry.')->flash();
 
         return \Redirect::to($this->crud->route);

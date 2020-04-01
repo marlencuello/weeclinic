@@ -19,7 +19,12 @@ class Paciente extends Model
     // protected $primaryKey = 'id';
     // public $timestamps = false;
     protected $guarded = ['id'];
-    // protected $fillable = [];
+    protected $fillable = [
+        'nombre',
+        'apellido',
+        'tipo_doc',
+        'nro_doc'
+    ];
     // protected $hidden = [];
     // protected $dates = [];
 
