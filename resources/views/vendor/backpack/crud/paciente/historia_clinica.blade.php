@@ -4,7 +4,7 @@
 $defaultBreadcrumbs = [
 trans('backpack::crud.admin') => backpack_url('dashboard'),
 $crud->entity_name_plural => url($crud->route),
-trans('backpack::crud.edit') => false,
+'Historia Clinica' => false,
 ];
 
 // if breadcrumbs aren't defined in the CrudController, use the default breadcrumbs
@@ -27,7 +27,7 @@ $breadcrumbs = $breadcrumbs ?? $defaultBreadcrumbs;
 
 @section('content')
 <div class="row">
-	<div class="{{ $crud->getEditContentClass() }}">
+	<div class="{{ $crud->getEditContentClass() }}">	
 		<!-- Default box -->
 
 		@include('crud::inc.grouped_errors')
@@ -36,9 +36,12 @@ $breadcrumbs = $breadcrumbs ?? $defaultBreadcrumbs;
 			$entry->getKey())) enctype="multipart/form-data"
 			@endif
 			>-->
-			<form method="post" action="" @if ($crud->hasUploadFields('update',
-				$entry->getKey())) enctype="multipart/form-data"
-				@endif>
+			<form method="post"
+		  		action="{{ url($crud->route.'/'.$entry->getKey()) }}/paciente_hc"
+				@if ($crud->hasUploadFields('update', $entry->getKey()))
+				enctype="multipart/form-data"
+				@endif
+		  		>
 			{!! csrf_field() !!}
 			{!! method_field('PUT') !!}
 			@if ($crud->model->translationEnabled())
