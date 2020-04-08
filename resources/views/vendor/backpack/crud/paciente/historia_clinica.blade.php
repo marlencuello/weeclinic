@@ -27,7 +27,7 @@ $breadcrumbs = $breadcrumbs ?? $defaultBreadcrumbs;
 
 @section('content')
 <div class="row">
-	<div class="{{ $crud->getEditContentClass() }}">	
+	<div class="{{ $crud->getEditContentClass() }}">
 		<!-- Default box -->
 
 		@include('crud::inc.grouped_errors')
@@ -36,12 +36,11 @@ $breadcrumbs = $breadcrumbs ?? $defaultBreadcrumbs;
 			$entry->getKey())) enctype="multipart/form-data"
 			@endif
 			>-->
-			<form method="post"
-		  		action="{{ url($crud->route.'/'.$entry->getKey()) }}/paciente_hc"
-				@if ($crud->hasUploadFields('update', $entry->getKey()))
-				enctype="multipart/form-data"
-				@endif
-		  		>
+		<form method="post" action="{{ url($crud->route.'/'.$entry->getKey()) }}/paciente_hc" @if ($crud->
+			hasUploadFields('update', $entry->getKey()))
+			enctype="multipart/form-data"
+			@endif
+			>
 			{!! csrf_field() !!}
 			{!! method_field('PUT') !!}
 			@if ($crud->model->translationEnabled())
@@ -65,19 +64,31 @@ $breadcrumbs = $breadcrumbs ?? $defaultBreadcrumbs;
 			@endif
 			<!-- load the view from the application if it exists, otherwise load the one in the package -->
 			@if(view()->exists('vendor.backpack.crud.form_content'))
-			@include('vendor.backpack.crud.form_content', ['fields' => $crud->fields(), 'action' => 'saveHistoriaClinica'])
+			@include('vendor.backpack.crud.form_content', ['fields' => $crud->fields(), 'action' =>
+			'saveHistoriaClinica'])
 			@else
 			<div class="card">
 				<div class="card-body row">
-					@foreach ($paciente->historiaclinica as $item)
+					@foreach ($paciente->historiaclinica as $v => $item)
 					<div class="form-group col-sm-12">
-						<label for=""></label>
-						<textarea name="" id="" rows="5" class="form-control">{{$item->observacion}}</textarea>
+					<label for="">
+						Última modificación 
+						@if($item->updated_at)
+							{{$item->updated_at}}
+						@else 
+							{{$item->created_at}}
+						@endif
+					</label>
+						<textarea name="observacion_id_{{$item->id}}" id="ckeditor-observacion_id_{{$item->id}}" class="form-control" data-init-function="bpFieldInitCKEditorElement">{{$item->observacion}}</textarea>
 					</div>
 					@endforeach
 				</div>
 			</div>
+			<?php //dd($crud->fields()); ?>
 			@include('crud::form_content', ['fields' => $crud->fields(), 'action' => 'edit'])
+			<div class="hidden">
+				<input type="hidden" value="{{$paciente->id}}" name="id" class="form-control">
+			</div>
 			@endif
 
 			@include('crud::inc.form_save_buttons')
