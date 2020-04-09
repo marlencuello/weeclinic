@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin\Operations;
 
+use App\Models\Historiaclinica;
 use Illuminate\Support\Facades\Route;
 use App\Models\Paciente;
 use Illuminate\Support\Facades\Request;
@@ -40,7 +41,11 @@ trait PacienteHCOperation
         $this->crud->addField([
             'name' => 'observacion',
             'label' => 'Nueva observación',
-            'type' => 'tinymce',
+            'type' => 'ckeditor',
+            'options' => [
+                'removePlugins' => '',
+                'removeButtons' => 'About,Strike,Maximize,ShowBlocks,BGColor,FontSize,Font,Format,Styles,Image,Flash,Table,HorizontalRule, Smiley, SpecialChar, PageBreak, Iframe,Link,Unlink,Anchor,NumberedList,Outdent,Indent,Blockquote,CreateDiv,JustifyLeft,JustifyCenter,JustifyRight,JustifyBlock,BidiLtr,BidiRtl,Language,Source'
+            ]
         ]);
 
         /*$this->crud->addField([   // Upload
@@ -77,25 +82,42 @@ trait PacienteHCOperation
         $this->data['entry'] = $this->crud->getEntry($id);
         $this->data['crud'] = $this->crud;
         $this->data['saveAction'] = $this->crud->getSaveAction();
-        $this->data['urlSave'] = "/$id/historia_clinica/";
+        $this->data['urlSave'] = "/$id/paciente__hc/";
         $this->data['paciente'] = $paciente;
 
         $this->data['id'] = $id;
 
+        //dd($this->data);
+
         // load the view
         return view("crud::paciente.historia_clinica", $this->data);
     }
+
     public function savePacienteHc(Request $request = null)
     {
         $this->crud->hasAccessOrFail('PacienteHC');
-
-        // fallback to global request instance
-        if (is_null($request)) {
-            $request = \Request::instance();
+        // execute the FormRequest authorization and validation, if one is required
+        $request = $this->crud->validateRequest();
+        $form = $request->request->all();
+        //dd($form);
+        foreach ($form['observacion_id'] as $k => $observacion) {
+            $historia_clinica = Historiaclinica::updateOrCreate(
+                ['id' => $k],
+                ['observacion' => $observacion]
+            );
         }
-        dd($request);
+
+        if ($form['observacion'] != "") {
+            $hc = new Historiaclinica;
+            $hc->observacion = $form['observacion'];
+            $hc->paciente_id = $request->get($this->crud->model->getKeyName());
+            $hc->save();
+        }
 
         \Alert::success('Historia clinica actualizada')->flash();
+
+        // save the redirect choice for next time
+        $this->crud->setSaveAction();
 
         return \Redirect::to($this->crud->route);
     }

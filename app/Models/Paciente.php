@@ -23,7 +23,8 @@ class Paciente extends Model
         'nombre',
         'apellido',
         'tipo_doc',
-        'nro_doc'
+        'nro_doc',
+        'observacion[]'
     ];
     // protected $hidden = [];
     // protected $dates = [];

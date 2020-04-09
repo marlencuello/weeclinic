@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Requests\HistoriaclinicaRequest;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use App\Models\Paciente;
 
 /**
  * Class HistoriaclinicaCrudController
@@ -29,7 +30,19 @@ class HistoriaclinicaCrudController extends CrudController
     protected function setupListOperation()
     {
         // TODO: remove setFromDb() and manually define Columns, maybe Filters
-        $this->crud->setFromDb();
+        //$this->crud->setFromDb();
+        $this->crud->addColumn([
+            'name' => 'nombre_paciente', // The db column name
+            'label' => "Paciente", // Table column heading
+            'type' => 'closure',
+            'function' => function ($entry) {
+                $paciente = Paciente::find($entry->paciente_id);
+                return $paciente['apellido']." ".$paciente['nombre'];
+            }
+        ]);
+        $this->crud->addColumn([
+            'name' => 'observacion', 'type' => 'text', 'label' => 'Observación'
+        ]);
     }
 
     protected function setupCreateOperation()

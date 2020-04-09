@@ -4,13 +4,12 @@
 <li class='nav-item'><a class='nav-link' href='{{ backpack_url('prepaga') }}'><i class='nav-icon fa fa-credit-card'></i> Prepagas</a></li>
 <li class='nav-item'><a class='nav-link' href='{{ backpack_url('setting') }}'><i class='nav-icon fa fa-cog'></i> Settings</a></li>
 <li class="nav-item nav-dropdown">
-	<a class="nav-link nav-dropdown-toggle" href="#"><i class="nav-icon fa fa-group"></i> Authentication</a>
+	<a class="nav-link nav-dropdown-toggle" href="#"><i class="nav-icon fa fa-group"></i> Autentificación</a>
 	<ul class="nav-dropdown-items">
-	  <li class="nav-item"><a class="nav-link" href="{{ backpack_url('user') }}"><i class="nav-icon fa fa-user"></i> <span>Users</span></a></li>
+	  <li class="nav-item"><a class="nav-link" href="{{ backpack_url('user') }}"><i class="nav-icon fa fa-user"></i> <span>Usuarios</span></a></li>
 	  <li class="nav-item"><a class="nav-link" href="{{ backpack_url('role') }}"><i class="nav-icon fa fa-group"></i> <span>Roles</span></a></li>
-	  <li class="nav-item"><a class="nav-link" href="{{ backpack_url('permission') }}"><i class="nav-icon fa fa-key"></i> <span>Permissions</span></a></li>
+	  <li class="nav-item"><a class="nav-link" href="{{ backpack_url('permission') }}"><i class="nav-icon fa fa-key"></i> <span>Permisos</span></a></li>
 	</ul>
 </li>
 <li class='nav-item'><a class='nav-link' href='{{ backpack_url('paciente') }}'><i class='nav-icon fa fa-user'></i> Pacientes</a></li>
-<li class='nav-item'><a class='nav-link' href='{{ backpack_url('historiaclinica') }}'><i class='nav-icon fa fa-folder'></i> Historiasclinicas</a></li>
-<li class='nav-item'><a class='nav-link' href='{{ backpack_url('page') }}'><i class='nav-icon fa fa-file-o'></i> <span>Pages</span></a></li>
+<li class='nav-item'><a class='nav-link' href='{{ backpack_url('historiaclinica') }}'><i class='nav-icon fa fa-folder'></i> Historias Clinicas</a></li>

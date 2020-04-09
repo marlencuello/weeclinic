@@ -71,15 +71,15 @@ $breadcrumbs = $breadcrumbs ?? $defaultBreadcrumbs;
 				<div class="card-body row">
 					@foreach ($paciente->historiaclinica as $v => $item)
 					<div class="form-group col-sm-12">
-					<label for="">
-						Última modificación 
-						@if($item->updated_at)
-							{{$item->updated_at}}
-						@else 
-							{{$item->created_at}}
-						@endif
-					</label>
-						<textarea name="observacion_id_{{$item->id}}" id="ckeditor-observacion_id_{{$item->id}}" class="form-control" data-init-function="bpFieldInitCKEditorElement">{{$item->observacion}}</textarea>
+						<label for="">
+							Última modificación 
+							@if($item->updated_at)
+								{{$item->updated_at}}
+							@else 
+								{{$item->created_at}}
+							@endif
+						</label>
+						<textarea name="observacion_id[{{$item->id}}]" id="ckeditor-observacion_id_{{$item->id}}" class="form-control sr-only" data-init-function="bpFieldInitCKEditorElement">{{$item->observacion}}</textarea>
 					</div>
 					@endforeach
 				</div>
