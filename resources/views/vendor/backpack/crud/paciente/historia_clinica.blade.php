@@ -14,8 +14,9 @@ $breadcrumbs = $breadcrumbs ?? $defaultBreadcrumbs;
 @section('header')
 <section class="container-fluid">
 	<h2>
-		<span class="text-capitalize">{!! $crud->getHeading() ?? $crud->entity_name_plural !!}</span>
-		<small>{!! $crud->getSubheading() ?? trans('backpack::crud.edit').' '.$crud->entity_name !!}.</small>
+		<span class="text-capitalize">{!! $crud->getHeading() ?? $crud->entity_name !!} {!! $crud->entry->apellido !!}
+			{!! $crud->entry->nombre !!}</span>
+		<small>Historia clinica</small>
 
 		@if ($crud->hasAccess('list'))
 		<small><a href="{{ url($crud->route) }}" class="hidden-print font-sm"><i class="fa fa-angle-double-left"></i>
@@ -23,6 +24,18 @@ $breadcrumbs = $breadcrumbs ?? $defaultBreadcrumbs;
 		@endif
 	</h2>
 </section>
+<div class="container-fluid animated fadeIn">
+	<div class="card">
+		<div class="card-body row">
+			<div class="col-4">
+				
+			</div>
+			<div class="col-4"></div>
+			<div class="col-4"></div>
+		</div>
+	</div>
+</div>
+
 @endsection
 
 @section('content')
@@ -72,14 +85,16 @@ $breadcrumbs = $breadcrumbs ?? $defaultBreadcrumbs;
 					@foreach ($paciente->historiaclinica as $v => $item)
 					<div class="form-group col-sm-12">
 						<label for="">
-							Última modificación 
+							Última modificación
 							@if($item->updated_at)
-								{{$item->updated_at}}
-							@else 
-								{{$item->created_at}}
+							{{$item->updated_at}}
+							@else
+							{{$item->created_at}}
 							@endif
 						</label>
-						<textarea name="observacion_id[{{$item->id}}]" id="ckeditor-observacion_id_{{$item->id}}" class="form-control sr-only" data-init-function="bpFieldInitCKEditorElement">{{$item->observacion}}</textarea>
+						<textarea name="observacion_id[{{$item->id}}]" id="ckeditor-observacion_id_{{$item->id}}"
+							class="form-control sr-only"
+							data-init-function="bpFieldInitCKEditorElement">{{$item->observacion}}</textarea>
 					</div>
 					@endforeach
 				</div>

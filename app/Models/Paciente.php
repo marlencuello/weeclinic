@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 class Paciente extends Model
 {
@@ -24,7 +25,25 @@ class Paciente extends Model
         'apellido',
         'tipo_doc',
         'nro_doc',
-        'observacion[]'
+        'observacion[]',
+        'num_hc',
+        'sexo',
+        'fecha_nacimiento',
+        'estado_civil',
+        'telefono',
+        'num_afiliado',
+        'edad_primer_rs',
+        'menarca',
+        'ritmo',
+        'alergias',
+        'mac',
+        'cirugias',
+        'enfermedades',
+        'antecedente_personal',
+        'antecedente_familiar',
+        'tabaquista',
+        'alcohol',
+        'drogas'
     ];
     // protected $hidden = [];
     // protected $dates = [];
@@ -34,7 +53,12 @@ class Paciente extends Model
     | FUNCTIONS
     |--------------------------------------------------------------------------
     */
-
+    public function calcular_edad()
+    {
+        //$myDate = '1995-07-02';
+        $edad = Carbon::parse($this->fecha_nacimiento)->age;
+        return $edad;
+    }
     /*
     |--------------------------------------------------------------------------
     | RELATIONS

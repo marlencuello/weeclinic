@@ -37,7 +37,14 @@ class HistoriaclinicaCrudController extends CrudController
             'type' => 'closure',
             'function' => function ($entry) {
                 $paciente = Paciente::find($entry->paciente_id);
-                return $paciente['apellido']." ".$paciente['nombre'];
+                return $paciente['apellido'] . " " . $paciente['nombre'];
+            },
+            'model' => 'App\Models\Paciente',
+            'searchLogic' => function ($query, $column, $searchTerm) {
+                $query->whereHas('pacientes', function ($q) use ($column, $searchTerm) {
+                    $q->where('nombre', 'like', '%'.$searchTerm.'%');
+                    $q->orWhere('apellido', 'like', '%'.$searchTerm.'%');
+                });
             }
         ]);
         $this->crud->addColumn([
