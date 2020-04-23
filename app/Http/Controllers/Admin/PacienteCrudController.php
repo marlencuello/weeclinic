@@ -7,7 +7,7 @@ use App\Models\Historiaclinica;
 use App\Models\Paciente;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
-use Illuminate\Support\Facades\Route;
+use DebugBar\DebugBar;
 
 /**
  * Class PacienteCrudController
@@ -21,6 +21,7 @@ class PacienteCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
+    use \App\Http\Controllers\Admin\Operations\PacienteHCOperation;
 
     public function setup()
     {
@@ -32,27 +33,108 @@ class PacienteCrudController extends CrudController
     protected function setupListOperation()
     {
         // TODO: remove setFromDb() and manually define Columns, maybe Filters
-        $this->crud->setFromDb();
+        //$this->crud->setFromDb();
+        $this->crud->addColumn([
+            'name' => 'nombre', // The db column name
+            'label' => "Nombre", // Table column heading
+            'type' => 'Text',
+            'searchLogic' => function ($query, $column, $searchTerm) {
+                $query->orWhere('nombre', 'like', '%' . $searchTerm . '%');
+            }
+        ]);
+        $this->crud->addColumn([
+            'name' => 'apellido', // The db column name
+            'label' => "Apellido", // Table column heading
+            'type' => 'Text',
+            'searchLogic' => function ($query, $column, $searchTerm) {
+                $query->orWhere('apellido', 'like', '%' . $searchTerm . '%');
+            }
+        ]);
+        $this->crud->addColumn([
+            'name' => 'nro_doc', // The db column name
+            'label' => "Numero Documento", // Table column heading
+            'type' => 'Text',
+            'searchLogic' => function ($query, $column, $searchTerm) {
+                $query->orWhere('nro_doc', 'like', $searchTerm . '%');
+            }
+        ]);
+        
+        $this->crud->addColumn([
+            'name' => 'edad', // The db column name
+            'label' => "Edad", // Table column heading
+            'type' => 'closure',
+            'function' => function ($entry) {
+                return $entry->calcular_edad()." años <small>(".$entry->fecha_nacimiento.")</small>";
+            }
+        ]);
+        
+        $this->crud->addColumn([
+            'name' => 'telefono', // The db column name
+            'label' => "Teléfono", // Table column heading
+            'type' => 'text',
+        ]);
+
         $this->crud->enableExportButtons();
     }
 
     protected function setupCreateOperation()
     {
         $this->crud->setValidation(PacienteRequest::class);
-        // TODO: remove setFromDb() and manually define Fields
-        //$this->crud->setFromDb();
+
+        //dd(Paciente::latest()->first()->id);
+
         $this->crud->addField([
-            'name' => 'nombres_apellidos',
+            'name' => 'num_hc',
             'type' => 'text',
-            'label' => "Apellido y nombre",
+            'label' => "Número de Historia Clínica",
+            'attributes' => []
+        ]);
+
+        $this->crud->addField([   // CustomHTML
+            'name' => 'separator',
+            'type' => 'custom_html',
+            'value' => '<h5><i class="fa fa-dot-circle-o"></i> Datos personales</h5>'
+        ]);
+
+        $this->crud->addField([
+            'name' => 'nombre',
+            'type' => 'text',
+            'label' => "Nombre",
             'attributes' => [
                 'required' => 'required'
             ]
         ]);
         $this->crud->addField([
+            'name' => 'apellido',
+            'type' => 'text',
+            'label' => "Apellido",
+            'attributes' => [
+                'required' => 'required'
+            ]
+        ]);
+        $this->crud->addField([
+            'name' => 'sexo',
+            'type' => 'enum',
+            'label' => "Sexo",
+            'attributes' => [
+                'required' => 'required'
+            ]
+        ]);
+        $this->crud->addField([
+            'name' => 'fecha_nacimiento',
+            'type' => 'date',
+            'label' => "Fecha de nacimiento",
+            'attributes' => [
+                'required' => 'required'
+            ],
+        ]);
+        $this->crud->addField([
             'name' => 'tipo_doc',
             'type' => 'enum',
-            'label' => "Tipo de documento"
+            'label' => "Tipo de documento",
+            'attributes' => [
+                'required' => 'required'
+            ]
         ]);
         $this->crud->addField([
             'name' => 'nro_doc',
@@ -65,95 +147,143 @@ class PacienteCrudController extends CrudController
             ],
         ]);
         $this->crud->addField([
-            'type' => 'select2',
-            'name' => 'prepaga_id', // the relationship name in your Model
-            'entity' => 'prepagas', // the relationship name in your Model
-            'attribute' => 'name', // attribute on Article that is shown to admin
-            'pivot' => false, // on create&update, do you need to add/delete pivot table entries?
+            'name' => 'estado_civil',
+            'type' => 'enum',
+            'label' => "Estado Civil",
+            'attributes' => [
+                'required' => 'required'
+            ]
         ]);
+        $this->crud->addField([
+            'name' => 'telefono',
+            'type' => 'text',
+            'label' => "Teléfono de contacto",
+            'attributes' => []
+        ]);
+        $this->crud->addField(
+            [  // Select
+                'label' => "Seleccione prepaga",
+                'type' => 'select',
+                'name' => 'prepaga_id', // the db column for the foreign key
+                'entity' => 'prepagas', // the method that defines the relationship in your Model
+                'attribute' => 'name', // foreign key attribute that is shown to user
+
+                // optional
+                'model' => "App\Models\Prepaga",
+                'options'   => (function ($query) {
+                    return $query->orderBy('name', 'ASC')->get();
+                }), // force the related options to be a custom query, instead of all(); you can use this to filter the results show in the select
+            ]
+        );
+
+        $this->crud->addField([
+            'name' => 'num_afiliado',
+            'label' => 'Número de afiliado',
+            'type' => 'text'
+        ]);
+
+        $this->crud->addField([   // CustomHTML
+            'name' => 'separator',
+            'type' => 'custom_html',
+            'value' => '<hr><h5><i class="fa fa-dot-circle-o"></i> Antecedentes</h5>'
+        ]);
+
+        $this->crud->addField([
+            'name' => 'edad_primer_rs',
+            'label' => 'Edad de primera relación sexual',
+            'type' => 'number',
+            'attributes' => [
+                'step' => 1,
+                'min' => 0,
+                'max' => 100
+            ]
+        ]);
+        $this->crud->addField([
+            'name' => 'menarca',
+            'label' => 'Edad de menarca',
+            'type' => 'number',
+            'attributes' => [
+                'step' => 1,
+                'min' => 0,
+                'max' => 100
+            ]
+        ]);
+
+        $this->crud->addField([
+            'name' => 'ritmo',
+            'label' => 'Ritmo menstrual',
+            'type' => 'text',
+            'attributes' => []
+        ]);
+
+        $this->crud->addField([
+            'name' => 'alergias',
+            'label' => 'Alergias que padece',
+            'type' => 'text',
+            'attributes' => []
+        ]);
+
+        $this->crud->addField([
+            'name' => 'mac',
+            'label' => 'MAC',
+            'type' => 'text',
+            'attributes' => []
+        ]);
+
+        $this->crud->addField([
+            'name' => 'cirugias',
+            'label' => 'Cirugias',
+            'type' => 'text',
+            'attributes' => []
+        ]);
+
+        $this->crud->addField([
+            'name' => 'enfermedades',
+            'label' => 'Enfermedades',
+            'type' => 'text',
+            'attributes' => []
+        ]);
+
+        $this->crud->addField([
+            'name' => 'antecedente_personal',
+            'label' => 'Antecedentes personales',
+            'type' => 'text',
+            'attributes' => []
+        ]);
+
+        $this->crud->addField([
+            'name' => 'antecedente_familiar',
+            'label' => 'Antecedentes familiares',
+            'type' => 'text',
+            'attributes' => []
+        ]);
+
+        $this->crud->addField([
+            'name' => 'tabaquista',
+            'label' => '¿Consume tabaco?',
+            'type' => 'enum',
+            'attributes' => []
+        ]);
+
+        $this->crud->addField([
+            'name' => 'alcohol',
+            'label' => '¿Consume alcohol?',
+            'type' => 'enum',
+            'attributes' => []
+        ]);
+
+        $this->crud->addField([
+            'name' => 'drogas',
+            'label' => '¿Consume drogas?',
+            'type' => 'enum',
+            'attributes' => []
+        ]);
+
+        $this->crud->removeField('observacion');
     }
 
     protected function setupUpdateOperation()
     {
         $this->setupCreateOperation();
-    }
-
-    /**
-     * Add the default settings, buttons, etc that this operation needs.
-     */
-    protected function setupHistoriaClinicaDefaults()
-    {
-        $this->crud->allowAccess('HistoriaClinica');
-
-        $this->crud->addField([
-            'name' => 'observacion',
-            'label' => 'Nueva observación',
-            'type' => 'tinymce',
-        ]);
-
-        /*$this->crud->addField([   // Upload
-            'name' => 'archivo',
-            'label' => 'Archivo (opcional)',
-            'type' => 'upload',
-            'upload' => true,
-            'disk' => 'uploads', // if you store files in the /public folder, please ommit this; if you store them in /storage or S3, please specify it;
-            // optional:
-            'temporary' => 10 // if using a service, such as S3, that requires you to make temporary URL's this will make a URL that is valid for the number of minutes specified
-        ]);*/
-
-        $this->crud->operation('HistoriaClinica', function () {
-            $this->crud->loadDefaultOperationSettingsFromConfig();
-        });
-
-        $this->crud->operation('list', function () {
-            $this->crud->addButton('line', 'HistoriaClinica', 'view', 'crud::buttons.historia_clinica');
-        });
-    }
-
-    protected function setupHistoriaClinicaRoutes($segment, $routeName, $controller)
-    {
-        //dd($routeName.'.historiaClinica');
-        //dd($controller.'.historiaClinica');
-        Route::get($segment . '/{id}/historia_clinica', [
-            'as'        => $routeName . '.historiaClinica',
-            'uses'      => $controller . '@historiaClinica',
-            'operation' => 'historiaClinica',
-        ]);
-
-        Route::put($segment . '/{id}/historia_clinica', [
-            'as'        => $routeName . '.saveHistoriaClinica',
-            'uses'      => $controller . '@saveHistoriaClinica',
-            'operation' => 'historiaClinica',
-        ]);
-    }
-
-    public function historiaClinica($id)
-    {
-        // get entry ID from Request (makes sure its the last ID for nested resources)
-        $id = $this->crud->getCurrentEntryId() ?? $id;
-        $pacientes = Paciente::where(array('id' => $id))->with('historiaClinica')->get();
-        $paciente = $pacientes[0];
-        $this->data['title'] = $this->crud->getTitle() ?? 'Historia clinica ' . $this->crud->entity_name;
-        //$this->crud->setOperationSetting('fields', $this->crud->getUpdateFields());
-
-        // get the info for that entry
-        $this->data['entry'] = $this->crud->getEntry($id);
-        $this->data['crud'] = $this->crud;
-        $this->data['saveAction'] = $this->crud->getSaveAction();
-        $this->data['urlSave'] = "/$id/historia_clinica/";
-        $this->data['paciente'] = $paciente;
-
-        $this->data['id'] = $id;
-
-        // load the view
-        return view("crud::paciente.historia_clinica", $this->data);
-    }
-    public function saveHistoriaClinica(Request $request = null)
-    {
-        $this->crud->hasAccessOrFail('update');
-        
-        \Alert::success('Moderation saved for this entry.')->flash();
-
-        return \Redirect::to($this->crud->route);
     }
 }

@@ -34,9 +34,9 @@ class Historiaclinica extends Model
     | RELATIONS
     |--------------------------------------------------------------------------
     */
-    public function paciente()
+    public function pacientes()
     {
-        return $this->belongsTo('App\Models\Paciente');
+        return $this->belongsTo('App\Models\Paciente', 'paciente_id');
     }
     /*
     |--------------------------------------------------------------------------

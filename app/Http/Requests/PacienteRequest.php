@@ -26,7 +26,11 @@ class PacienteRequest extends FormRequest
     public function rules()
     {
         return [
-            // 'name' => 'required|min:5|max:255'
+            'nombre' => 'required|max:255',
+            'apellido' => 'required|max:255',
+            'nro_doc' => 'required|max:11',
+            'sexo' => 'required',
+            'fecha_nacimiento' => 'required|max:10',
         ];
     }
 
