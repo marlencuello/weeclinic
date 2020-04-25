@@ -45,7 +45,6 @@ class Historiaclinica extends Model
     */
     public function scopeByPaciente($query, $id)
     {
-
         return $query->where('paciente_id', $id);
     }
     /*

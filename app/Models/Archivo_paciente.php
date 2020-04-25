@@ -4,9 +4,8 @@ namespace App\Models;
 
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Carbon;
 
-class Paciente extends Model
+class Archivo_paciente extends Model
 {
     use CrudTrait;
 
@@ -16,35 +15,11 @@ class Paciente extends Model
     |--------------------------------------------------------------------------
     */
 
-    protected $table = 'pacientes';
+    protected $table = 'archivo_pacientes';
     // protected $primaryKey = 'id';
     // public $timestamps = false;
     protected $guarded = ['id'];
-    protected $fillable = [
-        'nombre',
-        'apellido',
-        'tipo_doc',
-        'nro_doc',
-        'observacion[]',
-        'num_hc',
-        'sexo',
-        'fecha_nacimiento',
-        'estado_civil',
-        'telefono',
-        'num_afiliado',
-        'edad_primer_rs',
-        'menarca',
-        'ritmo',
-        'alergias',
-        'mac',
-        'cirugias',
-        'enfermedades',
-        'antecedente_personal',
-        'antecedente_familiar',
-        'tabaquista',
-        'alcohol',
-        'drogas'
-    ];
+    // protected $fillable = [];
     // protected $hidden = [];
     // protected $dates = [];
 
@@ -53,30 +28,15 @@ class Paciente extends Model
     | FUNCTIONS
     |--------------------------------------------------------------------------
     */
-    public function calcular_edad()
-    {
-        //$myDate = '1995-07-02';
-        $edad = Carbon::parse($this->fecha_nacimiento)->age;
-        return $edad;
-    }
+
     /*
     |--------------------------------------------------------------------------
     | RELATIONS
     |--------------------------------------------------------------------------
     */
 
-    public function prepagas()
-    {
-        return $this->belongsTo('App\Models\Prepaga', 'prepaga_id');
-    }
-
-    public function historiaClinica()
-    {
-        return $this->hasMany('App\Models\HistoriaClinica');
-    }
-
-    public function archivos() {
-        return $this->belongsToMany('\App\Models\Archivo','archivo_paciente')->withPivot('paciente_id');
+    public function paciente() {
+        return $this->belongsToMany('\App\Models\Archivo','archivo_paciente')->withPivot('archivo_id');
     }
 
     /*
