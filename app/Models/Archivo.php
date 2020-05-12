@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
+use DebugBar\DebugBar;
 use Illuminate\Database\Eloquent\Model;
 
 class Archivo extends Model
@@ -31,7 +32,7 @@ class Archivo extends Model
     | FUNCTIONS
     |--------------------------------------------------------------------------
     */
-
+    
     /*
     |--------------------------------------------------------------------------
     | RELATIONS
@@ -55,4 +56,12 @@ class Archivo extends Model
     | MUTATORS
     |--------------------------------------------------------------------------
     */
+
+    public function setNombreAttribute($value)
+    {
+        $attribute_name = "nombre";
+        $disk = "uploads";
+        $destination_path = "";
+        $this->uploadFileToDisk($value, $attribute_name, $disk, $destination_path);
+    }
 }

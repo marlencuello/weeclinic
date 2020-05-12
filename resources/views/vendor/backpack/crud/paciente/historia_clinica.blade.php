@@ -95,6 +95,8 @@ $breadcrumbs = $breadcrumbs ?? $defaultBreadcrumbs;
 						<textarea name="observacion_id[{{$item->id}}]" id="ckeditor-observacion_id_{{$item->id}}"
 							class="form-control sr-only"
 							data-init-function="bpFieldInitCKEditorElement">{{$item->observacion}}</textarea>
+						<div>
+						</div>
 					</div>
 					@endforeach
 				</div>

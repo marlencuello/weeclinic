@@ -73,7 +73,7 @@ trait PacienteHCOperation
         $this->crud->setOperation('PacienteHC');
         // get entry ID from Request (makes sure its the last ID for nested resources)
         $id = $this->crud->getCurrentEntryId() ?? $id;
-        $pacientes = Paciente::where(array('id' => $id))->with('historiaClinica')->get();
+        $pacientes = Paciente::where(array('id' => $id))->with('historiaClinica')->orderBy('id', 'desc')->get();
         $paciente = $pacientes[0];
         $this->data['title'] = $this->crud->getTitle() ?? 'Historia clinica ' . $this->crud->entity_name;
         //$this->crud->setOperationSetting('fields', $this->crud->getUpdateFields());
@@ -84,7 +84,6 @@ trait PacienteHCOperation
         $this->data['saveAction'] = $this->crud->getSaveAction();
         $this->data['urlSave'] = "/$id/paciente__hc/";
         $this->data['paciente'] = $paciente;
-
         $this->data['id'] = $id;
 
         //dd($this->data);

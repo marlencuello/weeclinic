@@ -53,6 +53,7 @@ class Paciente extends Model
     | FUNCTIONS
     |--------------------------------------------------------------------------
     */
+
     public function calcular_edad()
     {
         //$myDate = '1995-07-02';
@@ -90,6 +91,10 @@ class Paciente extends Model
     | ACCESSORS
     |--------------------------------------------------------------------------
     */
+
+    public function getFullNameAttribute(){
+        return $this->apellido.', '.$this->nombre;
+    }
 
     /*
     |--------------------------------------------------------------------------
