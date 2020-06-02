@@ -19,7 +19,7 @@ class Historiaclinica extends Model
     // protected $primaryKey = 'id';
     // public $timestamps = false;
     protected $guarded = ['id'];
-    protected $fillable = ['observacion', 'paciente_id', 'archivos'];
+    protected $fillable = ['observacion', 'paciente_id', 'archivos', 'fum', 'embarazada'];
     protected $casts = [
         'archivos' => 'array'
     ];
@@ -36,8 +36,8 @@ class Historiaclinica extends Model
     {
         parent::boot();
         static::deleting(function($obj) {
-            if (count((array)$obj->photos)) {
-                foreach ($obj->photos as $file_path) {
+            if (count((array)$obj->archivos)) {
+                foreach ($obj->archivos as $file_path) {
                     \Storage::disk('public_folder')->delete($file_path);
                 }
             }
@@ -79,7 +79,6 @@ class Historiaclinica extends Model
         $attribute_name = "archivos";
         $disk = "uploads";
         $destination_path = "historias_clinicas";
-
         $this->uploadMultipleFilesToDisk($value, $attribute_name, $disk, $destination_path);
     }
 }

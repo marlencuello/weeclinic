@@ -87,6 +87,20 @@ class HistoriaclinicaCrudController extends CrudController
             ]
         );
         $this->crud->addField(
+            [
+                'name' => 'fum',
+                'label' => 'FUM',
+                'type' => 'date'
+            ]
+        );
+        $this->crud->addField(
+            [
+                'name' => 'embarazada',
+                'label' => 'La paciente se encuentra embarazada en este momento',
+                'type' => 'checkbox'
+            ]
+        );
+        $this->crud->addField(
             [   // Upload
                 'name' => 'archivos',
                 'label' => 'Archivos',

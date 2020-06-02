@@ -58,16 +58,16 @@ class PacienteCrudController extends CrudController
                 $query->orWhere('nro_doc', 'like', $searchTerm . '%');
             }
         ]);
-        
+
         $this->crud->addColumn([
             'name' => 'edad', // The db column name
             'label' => "Edad", // Table column heading
             'type' => 'closure',
             'function' => function ($entry) {
-                return $entry->calcular_edad()." años <small>(".$entry->fecha_nacimiento.")</small>";
+                return $entry->calcular_edad() . " años <small>(" . $entry->fecha_nacimiento . ")</small>";
             }
         ]);
-        
+
         $this->crud->addColumn([
             'name' => 'telefono', // The db column name
             'label' => "Teléfono", // Table column heading
@@ -158,6 +158,12 @@ class PacienteCrudController extends CrudController
             'name' => 'telefono',
             'type' => 'text',
             'label' => "Teléfono de contacto",
+            'attributes' => []
+        ]);
+        $this->crud->addField([
+            'name' => 'email',
+            'type' => 'email',
+            'label' => "Correo electrónico",
             'attributes' => []
         ]);
         $this->crud->addField(
@@ -279,11 +285,168 @@ class PacienteCrudController extends CrudController
             'attributes' => []
         ]);
 
+        $this->crud->addField(
+            [   // Upload
+                'name' => 'imagenes',
+                'label' => 'Imágenes',
+                'type' => 'upload_multiple',
+                'upload' => true,
+                'disk' => 'uploads', // if you store files in the /public folder, please ommit this; if you store them in /storage or S3, please specify it;
+                // optional:
+                //'temporary' => 10 // if using a service, such as S3, that requires you to make temporary URL's this will make a URL that is valid for the number of minutes specified
+            ]
+        );
+
         $this->crud->removeField('observacion');
+        $this->crud->removeField('embarazada');
+        $this->crud->removeField('fum');
+        $this->crud->removeField('archivos');
     }
 
     protected function setupUpdateOperation()
     {
         $this->setupCreateOperation();
+    }
+
+    protected function setupShowOperation()
+    {
+        $this->crud->set('show.setFromDb', false);
+        $this->crud->addColumn([
+            'name' => 'nombre',
+            'label' => 'Nombre',
+            'type' => 'text'
+        ]);
+        $this->crud->addColumn([
+            'name' => 'apellido',
+            'label' => 'Apellido',
+            'type' => 'text'
+        ]);
+        $this->crud->addColumn([
+            'name' => 'num_hc',
+            'label' => 'Número de historia clínica',
+            'type' => 'text'
+        ]);
+        $this->crud->addColumn([
+            'name' => 'sexo',
+            'label' => 'Sexo',
+            'type' => 'text'
+        ]);
+        $this->crud->addColumn([
+            'name' => 'fecha_nacimiento',
+            'label' => 'Fecha de nacimiento',
+            'type' => 'date'
+        ]);
+        $this->crud->addColumn([
+            'name' => 'tipo_doc',
+            'label' => 'Tipo de documento',
+            'type' => 'text'
+        ]);
+        $this->crud->addColumn([
+            'name' => 'nro_doc',
+            'label' => 'Número de documento',
+            'type' => 'text'
+        ]);
+        $this->crud->addColumn([
+            'name' => 'estado_civil',
+            'label' => 'Estado civil',
+            'type' => 'text'
+        ]);
+        $this->crud->addColumn([
+            'name' => 'telefono',
+            'label' => 'Teléfono de contacto',
+            'type' => 'text'
+        ]);
+        $this->crud->addColumn([
+            'name' => 'email',
+            'label' => 'Correo electrónico',
+            'type' => 'text'
+        ]);
+        $this->crud->addColumn([
+            'name' => 'prepaga', // the db column for the foreign key
+            'type' => 'closure',
+            'function' => function ($entry) {
+                $prepaga = "";
+                if($entry->prepagas()->first()) {
+                    $prepaga = $entry->prepagas()->first()->name;
+                }
+                return $prepaga;
+            }
+        ]);
+        $this->crud->addColumn([
+            'name' => 'num_afiliado',
+            'label' => 'Número de afiliado',
+            'type' => 'text'
+        ]);
+        $this->crud->addColumn([
+            'name' => 'menarca',
+            'label' => 'Edad de menarca',
+            'type' => 'text'
+        ]);
+        $this->crud->addColumn([
+            'name' => 'ritmo',
+            'label' => 'Ritmo',
+            'type' => 'text'
+        ]);
+        $this->crud->addColumn([
+            'name' => 'edad_primer_rs',
+            'label' => 'Edad de Primera Relación Sexual',
+            'type' => 'text'
+        ]);
+        $this->crud->addColumn([
+            'name' => 'paridad',
+            'label' => 'Paridad',
+            'type' => 'text'
+        ]);
+        $this->crud->addColumn([
+            'name' => 'mac',
+            'label' => 'MAC',
+            'type' => 'text'
+        ]);
+        $this->crud->addColumn([
+            'name' => 'alergias',
+            'label' => 'Alergias',
+            'type' => 'text'
+        ]);
+        $this->crud->addColumn([
+            'name' => 'cirugias',
+            'label' => 'Cirugias',
+            'type' => 'text'
+        ]);
+        $this->crud->addColumn([
+            'name' => 'enfermedades',
+            'label' => 'Enfermedades que padece',
+            'type' => 'text'
+        ]);
+        $this->crud->addColumn([
+            'name' => 'antecedente_personal',
+            'label' => 'Antedecentes personales',
+            'type' => 'text'
+        ]);
+        $this->crud->addColumn([
+            'name' => 'antecedente_familiar',
+            'label' => 'Antedecentes familiares',
+            'type' => 'text'
+        ]);
+        $this->crud->addColumn([
+            'name' => 'tabaquista',
+            'label' => 'Tabaquista',
+            'type' => 'text'
+        ]);
+        $this->crud->addColumn([
+            'name' => 'alcohol',
+            'label' => 'Consume alcohol',
+            'type' => 'text'
+        ]);
+        $this->crud->addColumn([
+            'name' => 'drogas',
+            'label' => 'Consume drogas',
+            'type' => 'text'
+        ]);
+        $this->crud->addColumn([
+            'name' => 'imagenes', // The db column name
+            'label' => "Imágenes", // Table column heading
+            'type' => 'upload_multiple',
+            'disk' => 'uploads',
+        ]);
     }
 }

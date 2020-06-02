@@ -48,6 +48,33 @@ trait PacienteHCOperation
             ]
         ]);
 
+        $this->crud->addField(
+            [
+                'name' => 'fum',
+                'label' => 'FUM',
+                'type' => 'date'
+            ]
+        );
+        $this->crud->addField(
+            [
+                'name' => 'embarazada',
+                'label' => 'La paciente se encuentra embarazada en este momento',
+                'type' => 'checkbox'
+            ]
+        );
+
+        $this->crud->addField(
+            [   // Upload
+                'name' => 'archivos',
+                'label' => 'Archivos',
+                'type' => 'upload_multiple',
+                'upload' => true,
+                'disk' => 'uploads', // if you store files in the /public folder, please ommit this; if you store them in /storage or S3, please specify it;
+                // optional:
+                //'temporary' => 10 // if using a service, such as S3, that requires you to make temporary URL's this will make a URL that is valid for the number of minutes specified
+            ]
+        );
+
         /*$this->crud->addField([   // Upload
             'name' => 'archivo',
             'label' => 'Archivo (opcional)',
@@ -82,7 +109,7 @@ trait PacienteHCOperation
         $this->data['entry'] = $this->crud->getEntry($id);
         $this->data['crud'] = $this->crud;
         $this->data['saveAction'] = $this->crud->getSaveAction();
-        $this->data['urlSave'] = "/$id/paciente__hc/";
+        $this->data['urlSave'] = "/$id/paciente_hc/";
         $this->data['paciente'] = $paciente;
         $this->data['id'] = $id;
 
@@ -97,18 +124,23 @@ trait PacienteHCOperation
         $this->crud->hasAccessOrFail('PacienteHC');
         // execute the FormRequest authorization and validation, if one is required
         $request = $this->crud->validateRequest();
-        $form = $request->request->all();
+        $form = $request->request->all();      
+        // foreach ($form as $k => $hc) {
+        //     $historia_clinica = Historiaclinica::updateOrCreate(
+        //         ['id' => $k],
+        //         ['observacion' => $hc['observacion']],
+        //         ['archivos'=> $hc['archivos']],
+        //         ['fum' => $hc['fum']],
+        //         ['embarazada' => $hc['embarazada']]
+        //     );
+        // }
         //dd($form);
-        foreach ($form['observacion_id'] as $k => $observacion) {
-            $historia_clinica = Historiaclinica::updateOrCreate(
-                ['id' => $k],
-                ['observacion' => $observacion]
-            );
-        }
-
         if ($form['observacion'] != "") {
             $hc = new Historiaclinica;
             $hc->observacion = $form['observacion'];
+            $hc->fum = $form['fum'];
+            $hc->embarazada = $form['embarazada'];
+            $hc->archivos = $form['archivos'];
             $hc->paciente_id = $request->get($this->crud->model->getKeyName());
             $hc->save();
         }
