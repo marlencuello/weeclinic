@@ -24,7 +24,7 @@ class HistoriaclinicaCrudController extends CrudController
     {
         $this->crud->setModel('App\Models\Historiaclinica');
         $this->crud->setRoute(config('backpack.base.route_prefix') . '/historiaclinica');
-        $this->crud->setEntityNameStrings('historiaclinica', 'historiasclinicas');
+        $this->crud->setEntityNameStrings('historia clinica', 'historias clinicas');
     }
 
     protected function setupListOperation()
@@ -42,13 +42,23 @@ class HistoriaclinicaCrudController extends CrudController
             'model' => 'App\Models\Paciente',
             'searchLogic' => function ($query, $column, $searchTerm) {
                 $query->whereHas('pacientes', function ($q) use ($column, $searchTerm) {
-                    $q->where('nombre', 'like', '%'.$searchTerm.'%');
-                    $q->orWhere('apellido', 'like', '%'.$searchTerm.'%');
+                    $q->where('nombre', 'like', '%' . $searchTerm . '%');
+                    $q->orWhere('apellido', 'like', '%' . $searchTerm . '%');
                 });
             }
         ]);
         $this->crud->addColumn([
             'name' => 'observacion', 'type' => 'text', 'label' => 'Observación'
+        ]);
+        $this->crud->addColumn([
+            'name' => 'archivos',
+            'type' => 'closure',
+            'label' => 'Documentación multimedia',
+            'function' => function ($entry) {
+                if ($entry->archivos != "") {
+                    return count($entry->archivos)." archivo/s";
+                }
+            }
         ]);
     }
 
@@ -57,7 +67,50 @@ class HistoriaclinicaCrudController extends CrudController
         $this->crud->setValidation(HistoriaclinicaRequest::class);
 
         // TODO: remove setFromDb() and manually define Fields
-        $this->crud->setFromDb();
+        //$this->crud->setFromDb();
+        $this->crud->addField([  // Select
+            'label' => "Paciente",
+            'type' => 'select',
+            'name' => 'paciente_id', // the db column for the foreign key
+            'entity' => 'pacientes', // the method that defines the relationship in your Model
+            'attribute' => 'FullName', // foreign key attribute that is shown to user
+        ]);
+        $this->crud->addField(
+            [
+                'name' => 'observacion',
+                'label' => 'Observación',
+                'type' => 'ckeditor',
+                'options' => [
+                    'removePlugins' => '',
+                    'removeButtons' => 'About,Strike,Maximize,ShowBlocks,BGColor,FontSize,Font,Format,Styles,Image,Flash,Table,HorizontalRule, Smiley, SpecialChar, PageBreak, Iframe,Link,Unlink,Anchor,NumberedList,Outdent,Indent,Blockquote,CreateDiv,JustifyLeft,JustifyCenter,JustifyRight,JustifyBlock,BidiLtr,BidiRtl,Language,Source'
+                ]
+            ]
+        );
+        $this->crud->addField(
+            [
+                'name' => 'fum',
+                'label' => 'FUM',
+                'type' => 'date'
+            ]
+        );
+        $this->crud->addField(
+            [
+                'name' => 'embarazada',
+                'label' => 'La paciente se encuentra embarazada en este momento',
+                'type' => 'checkbox'
+            ]
+        );
+        $this->crud->addField(
+            [   // Upload
+                'name' => 'archivos',
+                'label' => 'Archivos',
+                'type' => 'upload_multiple',
+                'upload' => true,
+                'disk' => 'uploads', // if you store files in the /public folder, please ommit this; if you store them in /storage or S3, please specify it;
+                // optional:
+                //'temporary' => 10 // if using a service, such as S3, that requires you to make temporary URL's this will make a URL that is valid for the number of minutes specified
+            ]
+        );
     }
 
     protected function setupUpdateOperation()

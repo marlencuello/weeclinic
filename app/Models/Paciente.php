@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
+use DebugBar\DebugBar;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
@@ -31,10 +32,12 @@ class Paciente extends Model
         'fecha_nacimiento',
         'estado_civil',
         'telefono',
+        'email',
         'num_afiliado',
         'edad_primer_rs',
         'menarca',
         'ritmo',
+        'paridad',
         'alergias',
         'mac',
         'cirugias',
@@ -43,7 +46,11 @@ class Paciente extends Model
         'antecedente_familiar',
         'tabaquista',
         'alcohol',
-        'drogas'
+        'drogas',
+        'imagenes'
+    ];
+    protected $casts = [
+        'imagenes' => 'array'
     ];
     // protected $hidden = [];
     // protected $dates = [];
@@ -53,11 +60,23 @@ class Paciente extends Model
     | FUNCTIONS
     |--------------------------------------------------------------------------
     */
+
     public function calcular_edad()
     {
-        //$myDate = '1995-07-02';
         $edad = Carbon::parse($this->fecha_nacimiento)->age;
         return $edad;
+    }
+
+    public static function boot()
+    {
+        parent::boot();
+        static::deleting(function($obj) {
+            if (count((array)$obj->imagenes)) {
+                foreach ($obj->imagenes as $file_path) {
+                    \Storage::disk('public_folder')->delete($file_path);
+                }
+            }
+        });
     }
     /*
     |--------------------------------------------------------------------------
@@ -75,6 +94,10 @@ class Paciente extends Model
         return $this->hasMany('App\Models\HistoriaClinica');
     }
 
+    /*public function archivos() {
+        return $this->belongsToMany('\App\Models\Archivo','archivo_paciente')->withPivot('paciente_id');
+    }*/
+
     /*
     |--------------------------------------------------------------------------
     | SCOPES
@@ -87,9 +110,22 @@ class Paciente extends Model
     |--------------------------------------------------------------------------
     */
 
+    public function getFullNameAttribute(){
+        return $this->apellido.', '.$this->nombre;
+    }
+
     /*
     |--------------------------------------------------------------------------
     | MUTATORS
     |--------------------------------------------------------------------------
     */
+
+    public function setImagenesAttribute($value)
+    {
+        $attribute_name = "imagenes";
+        $disk = "uploads";
+        $destination_path = "pacientes";
+        //dd($value);
+        $this->uploadMultipleFilesToDisk($value, $attribute_name, $disk, $destination_path);
+    }
 }

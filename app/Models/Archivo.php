@@ -3,9 +3,10 @@
 namespace App\Models;
 
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
+use DebugBar\DebugBar;
 use Illuminate\Database\Eloquent\Model;
 
-class Historiaclinica extends Model
+class Archivo extends Model
 {
     use CrudTrait;
 
@@ -15,14 +16,14 @@ class Historiaclinica extends Model
     |--------------------------------------------------------------------------
     */
 
-    protected $table = 'historiasclinicas';
+    protected $table = 'archivos';
     // protected $primaryKey = 'id';
     // public $timestamps = false;
     protected $guarded = ['id'];
-    protected $fillable = ['observacion', 'paciente_id', 'archivos', 'fum', 'embarazada'];
-    protected $casts = [
-        'archivos' => 'array'
-    ];
+    protected $fillable = ['nombre', 'extension'];
+    // protected $casts = [
+    //     'nombre' => 'array'
+    // ];
     // protected $hidden = [];
     // protected $dates = [];
 
@@ -31,37 +32,19 @@ class Historiaclinica extends Model
     | FUNCTIONS
     |--------------------------------------------------------------------------
     */
-
-    public static function boot()
-    {
-        parent::boot();
-        static::deleting(function($obj) {
-            if (count((array)$obj->archivos)) {
-                foreach ($obj->archivos as $file_path) {
-                    \Storage::disk('public_folder')->delete($file_path);
-                }
-            }
-        });
-    }
-
+    
     /*
     |--------------------------------------------------------------------------
     | RELATIONS
     |--------------------------------------------------------------------------
     */
-    public function pacientes()
-    {
-        return $this->belongsTo('App\Models\Paciente', 'paciente_id');
-    }
+
     /*
     |--------------------------------------------------------------------------
     | SCOPES
     |--------------------------------------------------------------------------
     */
-    public function scopeByPaciente($query, $id)
-    {
-        return $query->where('paciente_id', $id);
-    }
+
     /*
     |--------------------------------------------------------------------------
     | ACCESSORS
@@ -74,11 +57,11 @@ class Historiaclinica extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function setArchivosAttribute($value)
+    public function setNombreAttribute($value)
     {
-        $attribute_name = "archivos";
+        $attribute_name = "nombre";
         $disk = "uploads";
-        $destination_path = "historias_clinicas";
-        $this->uploadMultipleFilesToDisk($value, $attribute_name, $disk, $destination_path);
+        $destination_path = "";
+        $this->uploadFileToDisk($value, $attribute_name, $disk, $destination_path);
     }
 }

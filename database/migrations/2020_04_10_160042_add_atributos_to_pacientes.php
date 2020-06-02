@@ -24,7 +24,7 @@ class AddAtributosToPacientes extends Migration
             //ANTECEDENTES PERSONALES
             $table->smallInteger('edad_primer_rs')->nullable();
             $table->smallInteger('menarca')->nullable();
-            $table->char('ritmo', 4)->nullable();
+            $table->char('ritmo', 20)->nullable();
             $table->string('alergias', 200)->nullable();
             $table->string('mac', 100)->nullable();
             $table->string('cirugias', 200)->nullable();

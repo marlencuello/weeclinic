@@ -16,4 +16,5 @@ Route::group([
     //Route::get('paciente/{id}/historia_clinica', 'PacienteCrudController@historiaClinica');
     //Route::post('paciente/{id}/historia_clinica', 'PacienteCrudController@historiaClinica');
     Route::crud('historiaclinica', 'HistoriaclinicaCrudController');
+    Route::crud('archivo', 'ArchivoCrudController');
 }); // this should be the absolute last line of this file

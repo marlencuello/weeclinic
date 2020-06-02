@@ -22,7 +22,8 @@
 </li>
 @if(backpack_user()->hasPermissionTo('CRUD Pacientes', 'web'))
 <li class='nav-item'><a class='nav-link' href='{{ backpack_url('paciente') }}'><i class='nav-icon fa fa-user'></i>
-	Pacientes</a></li>
+	Pacientes</a></li>q
 @endif
 <li class='nav-item'><a class='nav-link' href='{{ backpack_url('historiaclinica') }}'><i
 			class='nav-icon fa fa-folder'></i> Historias Clinicas</a></li>
+<li class='nav-item'><a class='nav-link' href='{{ backpack_url('archivo') }}'><i class='nav-icon fa fa-files-o'></i> Archivos</a></li>

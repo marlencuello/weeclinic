@@ -5,7 +5,7 @@ namespace App\Models;
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Model;
 
-class Historiaclinica extends Model
+class Archivo_historiaclinica extends Model
 {
     use CrudTrait;
 
@@ -15,14 +15,11 @@ class Historiaclinica extends Model
     |--------------------------------------------------------------------------
     */
 
-    protected $table = 'historiasclinicas';
+    protected $table = 'archivo_historiaclinicas';
     // protected $primaryKey = 'id';
     // public $timestamps = false;
     protected $guarded = ['id'];
-    protected $fillable = ['observacion', 'paciente_id', 'archivos', 'fum', 'embarazada'];
-    protected $casts = [
-        'archivos' => 'array'
-    ];
+    // protected $fillable = [];
     // protected $hidden = [];
     // protected $dates = [];
 
@@ -32,36 +29,18 @@ class Historiaclinica extends Model
     |--------------------------------------------------------------------------
     */
 
-    public static function boot()
-    {
-        parent::boot();
-        static::deleting(function($obj) {
-            if (count((array)$obj->archivos)) {
-                foreach ($obj->archivos as $file_path) {
-                    \Storage::disk('public_folder')->delete($file_path);
-                }
-            }
-        });
-    }
-
     /*
     |--------------------------------------------------------------------------
     | RELATIONS
     |--------------------------------------------------------------------------
     */
-    public function pacientes()
-    {
-        return $this->belongsTo('App\Models\Paciente', 'paciente_id');
-    }
+
     /*
     |--------------------------------------------------------------------------
     | SCOPES
     |--------------------------------------------------------------------------
     */
-    public function scopeByPaciente($query, $id)
-    {
-        return $query->where('paciente_id', $id);
-    }
+
     /*
     |--------------------------------------------------------------------------
     | ACCESSORS
@@ -73,12 +52,4 @@ class Historiaclinica extends Model
     | MUTATORS
     |--------------------------------------------------------------------------
     */
-
-    public function setArchivosAttribute($value)
-    {
-        $attribute_name = "archivos";
-        $disk = "uploads";
-        $destination_path = "historias_clinicas";
-        $this->uploadMultipleFilesToDisk($value, $attribute_name, $disk, $destination_path);
-    }
 }

@@ -27,11 +27,57 @@ $breadcrumbs = $breadcrumbs ?? $defaultBreadcrumbs;
 <div class="container-fluid animated fadeIn">
 	<div class="card">
 		<div class="card-body row">
-			<div class="col-4">
-				
+			<div class="col-12 col-md-4">
+				N° Historia Clinica: <strong>{!! $crud->entry->num_hc !!}</strong>
+				<br />
+				DNI: <strong>{!! $crud->entry->nro_doc !!}</strong>
+				<br />
+				Sexo: <strong>{!! $crud->entry->sexo !!}</strong>
+				<br />
+				Edad: <strong>{!! $crud->entry->calcular_edad() !!} años</strong> <small>({!!
+					$crud->entry->fecha_nacimiento !!})</small>
+				<br />
+				Prepaga:
+				@if(isset($crud->entry->prepagas()->first()->name))
+				<strong>{{$crud->entry->prepagas()->first()->name}}</strong>
+				@else
+				Ninguna
+				@endif
+				<br />
+				N° Afiliado: <strong>{!! $crud->entry->num_afiliado !!}</strong>
+				<br />
+				Teléfono: <strong>{!! $crud->entry->telefono !!}</strong>
+				<br />
+				Correo electrónico: <strong>{!! $crud->entry->email !!}</strong>
 			</div>
-			<div class="col-4"></div>
-			<div class="col-4"></div>
+			<div class="col-12 col-md-4">
+				Tabaquista: <strong>{!! $crud->entry->tabaquista !!}</strong>
+				<br />
+				Consume alcohol: <strong>{!! $crud->entry->alcohol !!}</strong>
+				<br />
+				Consume drogas: <strong>{!! $crud->entry->drogas !!}</strong>
+				<br />
+				Primera R. sexual: <strong>{!! $crud->entry->edad_primera_rs !!}</strong>
+				<br />
+				Menarca: <strong>{!! $crud->entry->menarca !!}</strong>
+				<br />
+				Ritmo: <strong>{!! $crud->entry->ritmo !!}</strong>
+				<br />
+				MAC: <strong>{!! $crud->entry->mac !!}</strong>
+				<br />
+				Paridad: <strong>{!! $crud->entry->paridad !!}</strong>
+			</div>
+			<div class="col-12 col-md-4">
+				Alergias: <strong>{!! $crud->entry->alergias !!}</strong>
+				<br />
+				Cirugias: <strong>{!! $crud->entry->cirugias !!}</strong>
+				<br />
+				Enfermedades: <strong>{!! $crud->entry->enfermedades !!}</strong>
+				<br />
+				Antecedentes personales: <strong>{!! $crud->entry->antecedente_personal !!}</strong>
+				<br />
+				Antecedentes familiares: <strong>{!! $crud->entry->antecedente_familiar !!}</strong>
+			</div>
 		</div>
 	</div>
 </div>
@@ -81,20 +127,52 @@ $breadcrumbs = $breadcrumbs ?? $defaultBreadcrumbs;
 			'saveHistoriaClinica'])
 			@else
 			<div class="card">
-				<div class="card-body row">
+				<div class="card-body pt-2 row">
 					@foreach ($paciente->historiaclinica as $v => $item)
-					<div class="form-group col-sm-12">
-						<label for="">
-							Última modificación
-							@if($item->updated_at)
-							{{$item->updated_at}}
+					<div class="col-sm-12 pb-1 mb-2 border border-info rounded">
+						<div class="row mt-1">
+							<div class="col-6 p-1">
+								<i class="fa fa-clock-o"></i> <small>Realizada el
+									@if($item->updated_at)
+									{{$item->updated_at}}
+									@else
+									{{$item->created_at}}
+									@endif
+								</small>
+							</div>
+							<div class="col-6 p-1 text-right">
+								<a href="/admin/historiaclinica/{{$item->id}}/edit" class="btn btn-sm btn-primary btn-editar-hc">Editar</a>
+							</div>
+						</div>
+						<div class="col-12 p-1 font-110">{!!$item->observacion!!}</div>
+					<div class="row bg-light">
+						<div class="col-6 pr-3 pl-3">FUM: 
+							@if(($item->fum != "1900-01-01") && ($item->fum != ""))
+								{{$item->fum}}
 							@else
-							{{$item->created_at}}
+								No registrada
 							@endif
-						</label>
-						<textarea name="observacion_id[{{$item->id}}]" id="ckeditor-observacion_id_{{$item->id}}"
-							class="form-control sr-only"
-							data-init-function="bpFieldInitCKEditorElement">{{$item->observacion}}</textarea>
+						</div>
+						<div class="col-6 text-danger">
+							@if($item->embarazada)
+								<i class="fa fa-info-circle"></i> Embarazada
+							@endif
+						</div>
+					</div>
+						@if($item->archivos)
+						<div class="row m-1 pt-2 border-top border-info">
+							@foreach($item->archivos as $media)
+							<div class="col-12 col-md-2 pl-1 pr-1">
+								<figure class="figure">
+									<a href="/uploads/{{$media}}" target="_blank" class="">
+										<img src="/uploads/{{$media}}" class="figure-img img-fluid rounded"
+											alt="imágen de historia clinica" />
+									</a>
+								</figure>
+							</div>
+							@endforeach
+						</div>
+						@endif
 					</div>
 					@endforeach
 				</div>
