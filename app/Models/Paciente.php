@@ -29,6 +29,8 @@ class Paciente extends Model
         'observacion[]',
         'num_hc',
         'sexo',
+        'grupo_sanguineo',
+        'factor',
         'fecha_nacimiento',
         'estado_civil',
         'telefono',
@@ -78,6 +80,7 @@ class Paciente extends Model
             }
         });
     }
+
     /*
     |--------------------------------------------------------------------------
     | RELATIONS
@@ -87,6 +90,11 @@ class Paciente extends Model
     public function prepagas()
     {
         return $this->belongsTo('App\Models\Prepaga', 'prepaga_id');
+    }
+
+    public function turno()
+    {
+        return $this->belongsToMany('App\Models\Turnero', 'paciente_id');
     }
 
     public function historiaClinica()

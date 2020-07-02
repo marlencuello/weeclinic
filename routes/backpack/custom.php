@@ -17,4 +17,12 @@ Route::group([
     //Route::post('paciente/{id}/historia_clinica', 'PacienteCrudController@historiaClinica');
     Route::crud('historiaclinica', 'HistoriaclinicaCrudController');
     Route::crud('archivo', 'ArchivoCrudController');
+    Route::crud('turnero', 'TurneroCrudController');
+    Route::get('api/turnos', 'Api\TurnosController@index');
+    Route::get('api/turnos/{id}', 'Api\TurnosController@show');
+    Route::crud('provincia', 'ProvinciaCrudController');
+    Route::crud('ciudad', 'CiudadCrudController');
+    //IMPORTACIONES DE SISTEMA ANTERIOR
+    Route::get('paciente/importar', 'PacienteCrudController@importarPacientes');
+    Route::get('historiaclinica/importar', 'HistoriaclinicaCrudController@importarHC');
 }); // this should be the absolute last line of this file
