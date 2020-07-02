@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\HistoriaclinicaRequest;
+use App\Models\Historiaclinica;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use App\Models\Paciente;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class HistoriaclinicaCrudController
@@ -116,5 +119,21 @@ class HistoriaclinicaCrudController extends CrudController
     protected function setupUpdateOperation()
     {
         $this->setupCreateOperation();
+    }
+
+    public function importarHC () {
+        //['observacion', 'paciente_id', 'archivos', 'fum', 'embarazada'];
+        $hcs = DB::connection('mysql2')->table('historias')->skip(14000)->take(1000)->get();
+        $cantidad_procesadas = 0;
+        foreach ($hcs as $key => $hc) {
+            $historia_clinica = new Historiaclinica();
+            $historia_clinica->id = $hc->id;
+            $historia_clinica->paciente_id = $hc->id_cliente;
+            $historia_clinica->observacion = $hc->descripcion;
+            $historia_clinica->created_at = $hc->fecha_de_historia;
+            $historia_clinica->saveOrFail();
+            $cantidad_procesadas++;
+        }
+        return Carbon::now()->format('H:i:s')." -> historias clinicas importadas: ".$cantidad_procesadas;
     }
 }

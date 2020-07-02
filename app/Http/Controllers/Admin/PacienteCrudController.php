@@ -8,6 +8,7 @@ use App\Models\Paciente;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use DebugBar\DebugBar;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class PacienteCrudController
@@ -91,9 +92,9 @@ class PacienteCrudController extends CrudController
         ]);
 
         $this->crud->addField([   // CustomHTML
-            'name' => 'separator',
+            'name' => 'datos_personales',
             'type' => 'custom_html',
-            'value' => '<h5><i class="fa fa-dot-circle-o"></i> Datos personales</h5>'
+            'value' => '<hr class="bg-info"><h5><i class="fa fa-dot-circle-o"></i> Datos personales</h5>'
         ]);
 
         $this->crud->addField([
@@ -189,9 +190,9 @@ class PacienteCrudController extends CrudController
         ]);
 
         $this->crud->addField([   // CustomHTML
-            'name' => 'separator',
+            'name' => 'anamnesis',
             'type' => 'custom_html',
-            'value' => '<hr><h5><i class="fa fa-dot-circle-o"></i> Antecedentes</h5>'
+            'value' => '<hr class="bg-info"><h5><i class="fa fa-dot-circle-o"></i> Anamnesis</h5>'
         ]);
 
         $this->crud->addField([
@@ -366,7 +367,7 @@ class PacienteCrudController extends CrudController
             'type' => 'closure',
             'function' => function ($entry) {
                 $prepaga = "";
-                if($entry->prepagas()->first()) {
+                if ($entry->prepagas()->first()) {
                     $prepaga = $entry->prepagas()->first()->name;
                 }
                 return $prepaga;
@@ -377,6 +378,13 @@ class PacienteCrudController extends CrudController
             'label' => 'Número de afiliado',
             'type' => 'text'
         ]);
+        $this->crud->addColumn(
+            [   // CustomHTML
+                'name' => 'separator',
+                'type' => 'custom_html',
+                'value' => '<h4>Anamnesis</h4>'
+            ]
+        );
         $this->crud->addColumn([
             'name' => 'menarca',
             'label' => 'Edad de menarca',
@@ -448,5 +456,49 @@ class PacienteCrudController extends CrudController
             'type' => 'upload_multiple',
             'disk' => 'uploads',
         ]);
+    }
+
+    public function importarPacientes()
+    {
+        //$clientes = DB::connection('mysql2')->table('clientes')->take(3000)->get();
+        $clientes = DB::connection('mysql2')->table('clientes')->skip(3000)->take(2000)->get();
+        $creados = 0;
+        foreach ($clientes as $cliente) {
+            $paciente = new Paciente;
+            $tipo_doc = "DNI";
+            if ($cliente->tipo_doc == 3) {
+                $tipo_doc = "LC";
+            }
+            $sexo = "Masculino";
+            if ($cliente->sexo == "F") {
+                $sexo = "Femenino";
+            }
+            $estado_civil = 'Soltero/a';
+            if ($cliente->estado_civil == "C") {
+                $estado_civil = 'Casado/a';
+            }
+            if ($cliente->grupo_sanguineo != "No declarado" || $cliente->grupo_sanguineo != "0" || $cliente->grupo_sanguineo != "A" || $cliente->grupo_sanguineo != "B" || $cliente->grupo_sanguineo != "AB") {
+                $cliente->grupo_sanguineo = "No declarado";
+            }
+            if ($cliente->fecha_nacimiento != "0000-00-00") {
+                $paciente->fecha_nacimiento = $cliente->fecha_nacimiento;
+            }
+            $paciente->id = $cliente->id;
+            $paciente->nombre = $cliente->nombre;
+            $paciente->apellido = $cliente->apellido;
+            $paciente->tipo_doc = $tipo_doc;
+            $paciente->nro_doc = $cliente->cuit;
+            $paciente->sexo = $sexo;
+            $paciente->telefono = $cliente->telefono;
+            $paciente->num_afiliado = $cliente->num_afiliado;
+            $paciente->grupo_sanguineo = $cliente->grupo_sanguineo;
+            $paciente->factor = $cliente->factor;
+            $paciente->cirugias = $cliente->antecedentes_obstetricos;
+            $paciente->antecedente_personal = $cliente->antecedentes_personales;
+            $paciente->antecedente_familiar = $cliente->antecedentes_heredofamiliares;
+            $paciente->saveOrFail();
+            $creados++;
+        }
+        return 'pacientes creados: ' . $creados;
     }
 }
