@@ -12,3 +12,27 @@
 .table {
     overflow: hidden;
 }
+
+.dataTables_filter input {
+    border-radius: 0.5rem !important;
+}
+
+@media only screen and (max-width: 768px) {
+    .dataTables_filter {
+        margin-top: .75rem;
+    }
+    label {
+        display: block;
+    }
+    .dataTables_filter input {
+        margin-left: 0rem !important;
+        width: 100% !important;
+    }
+    .col-6 {
+        max-width: 100%;
+        flex: 0 0 100%;
+    }
+    #datatable_search_stack {
+        float: none !important;
+    }
+}
